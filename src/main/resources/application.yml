@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: file_study
+
+  profiles:
+    active: prod
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+
+  h2:
+    console:
+      enabled: true
+
+  servlet:
+    multipart:
+      enabled: true
+      maxFileSize: 200MB
+      maxRequestSize: 215MB
+
+  cloud:
+    aws:
+      s3:
+        bucket: ${spring.cloud.aws.s3.bucket}
+        base-url-format: ${spring.cloud.aws.s3.base-url-format}
+      credentials:
+        accessKey: ${spring.cloud.aws.credentials.accessKey}
+        secretKey: ${spring.cloud.aws.credentials.secretKey}
+      region:
+        static: ${spring.cloud.aws.region.static}
+      stack:
+        auto: ${spring.cloud.aws.stack.auto}
+
+file:
+  upload:
+    path: ${file.upload.path}
