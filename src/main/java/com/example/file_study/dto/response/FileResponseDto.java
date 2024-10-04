@@ -6,6 +6,7 @@ import lombok.Builder;
 public record FileResponseDto (
         Long fileId,
         byte[] file,
+        String fileName,
         String comment
 ) {
 }

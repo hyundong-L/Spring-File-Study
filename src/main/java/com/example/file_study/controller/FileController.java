@@ -17,7 +17,7 @@ public class FileController {
     /**
      * @Autowired 필드명 매칭 사용
      * 타입으로 조회 시도 후 동일한 타입의 빈이 2개 이상 존재하면 파라미터, 필드 이름으로 빈 조회
-     *
+     * <p>
      * localFileServiceImpl -> 로컬 서버 파일 서비스
      * s3FileServiceImpl -> AWS S3 파일 서비스
      */
@@ -35,8 +35,23 @@ public class FileController {
         return new ResponseTemplate<>(HttpStatus.CREATED, "File Upload Success");
     }
 
+    @PostMapping("/upload/multiple")
+    public ResponseTemplate<?> uploadMultipleFiles(
+            @RequestParam(name = "files") MultipartFile[] files,
+            @RequestParam(name = "comments") String[] comments
+    ) throws IOException {
+        fileService.uploadFiles(files, comments);
+        return new ResponseTemplate<>(HttpStatus.CREATED, "Files Upload Success");
+    }
+
     @GetMapping("/download/{fileId}")
     public ResponseTemplate<FileResponseDto> downloadFile(@PathVariable Long fileId) throws IOException {
         return new ResponseTemplate<>(HttpStatus.OK, "File Download Success", fileService.downloadFile(fileId));
+    }
+
+    @DeleteMapping("/delete/{fileId}")
+    public ResponseTemplate<?> deleteFile(@PathVariable Long fileId) throws IOException {
+        fileService.deleteFile(fileId);
+        return new ResponseTemplate<>(HttpStatus.OK, "File Delete Success");
     }
 }

@@ -46,12 +46,22 @@ public class LocalFileServiceImpl implements FileService {
         FileEntity findFile = fileRepository.findById(fileId).orElseThrow(() -> new NoSuchElementException("File Not Found"));
 
         Path path = Paths.get(findFile.getFilePath());
+        String fileName = findFile.getFilePath().substring(findFile.getFilePath().lastIndexOf("-") + 1);
 
         return FileResponseDto.builder()
                 .fileId(findFile.getFileId())
                 .file(Files.readAllBytes(path))
+                .fileName(fileName)
                 .comment(findFile.getFileComment())
                 .build();
+    }
+
+    @Override
+    public void deleteFile(Long fileId) throws IOException {
+        FileEntity findFile = fileRepository.findById(fileId).orElseThrow(() -> new NoSuchElementException("File Not Found"));
+
+        Path path = Paths.get(findFile.getFilePath());
+        Files.delete(path);
     }
 
     //파일을 서버에 저장

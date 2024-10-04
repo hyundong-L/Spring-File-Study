@@ -62,18 +62,29 @@ public class S3FileServiceImpl implements FileService {
 
         try {
             fileContent = inputStream.readAllBytes();
-            s3Object.close();
         } catch (IOException e) {
             throw new FileStorageException("Error occurred while downloading file", e);
+        } finally {
+            inputStream.close();
         }
+
+        String fileName = extractFileName(findFile.getFilePath());
 
         return FileResponseDto.builder()
                 .fileId(findFile.getFileId())
                 .file(fileContent)
+                .fileName(fileName)
                 .comment(findFile.getFileComment())
                 .build();
     }
 
+    @Override
+    public void deleteFile(Long fileId) throws IOException {
+        FileEntity file = fileRepository.findById(fileId).orElseThrow(() -> new NoSuchElementException("File Not Found"));
+        String fileName = extractFileName(file.getFilePath());
+
+        s3Client.deleteObject(bucket, fileName);
+    }
 
     private String uploadToS3(MultipartFile file, String fileName) throws IOException {
         String imageUrl = String.format(S3_BASE_URL_FORMAT, bucket) + fileName;
@@ -90,8 +101,7 @@ public class S3FileServiceImpl implements FileService {
         return metadata;
     }
 
-    //파일 이름만 분리 - 삭제 시 사용
-    private String extractFileNameFromUrl(String imageUrl) {
-        return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+    public String extractFileName(String fileName) {
+        return fileName.substring(fileName.lastIndexOf("/") + 1);
     }
 }
